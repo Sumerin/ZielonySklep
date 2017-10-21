@@ -1,0 +1,15 @@
+
+some-mysql:
+    build: ./greensql/
+    dockerfile: Dockerfile
+    environment:
+        - MYSQL_ROOT_PASSWORD=admin
+
+some-prestashop:
+    build: ./greenpresta/
+    dockerfile: Dockerfile
+    ports:
+        - "8080:80"
+    links:
+        - some-mysql
+         
