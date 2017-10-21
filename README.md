@@ -39,29 +39,34 @@ Need:
  # USEFULL COMMAND
   
   
-  - Show all containers
+  - Show all containers.
+  
   `
   sudo docker ps -a
   `
   
-  - enter container <name||id> with bash shell
+  - enter container <name||id> with bash shell.
+  
   `
   sudo docker exec -it <name||id> bash
   example.
   sudo docker exec -it some-mysql bash
   `
   
-  - Remove container <name||id>  
+  - Remove container <name||id>.
+  
   `
   sudo docker rm -f <name||id>
   `
   
-  - Remove image <imgName||imgId>
+  - Remove image <imgName||imgId>.
+  
   `
   sudo docker rmi <imgName||imgId>
   `
   
-  -Start Stop Restart container <name||id>
+  - Start Stop Restart container <name||id>.
+  
   `
   sudo docker start <name||id>
   sudo docker stop <name||id>
