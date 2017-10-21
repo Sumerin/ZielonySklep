@@ -5,8 +5,9 @@
 Need:
   - docker
   - docker-compose
+  
   `
-  sudo spt-get install docker docker-compose
+  sudo apt-get install docker docker-compose
   `
   
 ## Step 1
