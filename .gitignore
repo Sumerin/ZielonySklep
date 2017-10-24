@@ -8,14 +8,14 @@ config/settings.*.php
 
 /html/adminpanel/autoupgrade/
 /html/cache/
-!/cache/index.php
-!/cache/cachefs/index.php
-!/cache/purifier/index.php
-!/cache/push/index.php
-!/cache/sandbox/index.php
-!/cache/smarty/index.php
-!/cache/tcpdf/index.php
-config/xml/*.xml
+!/html/cache/index.php
+!/html/cache/cachefs/index.php
+!/html/cache/purifier/index.php
+!/html/cache/push/index.php
+!/html/cache/sandbox/index.php
+!/html/cache/smarty/index.php
+!/html/cache/tcpdf/index.php
+/html/config/xml/*.xml
 /log/*
 *sitemap.xml
 themes/*/cache/
