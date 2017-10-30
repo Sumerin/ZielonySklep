@@ -11,16 +11,40 @@ tesco_url = {'Owoce i warzywa':{'warzywa':'https://ezakupy.tesco.pl/groceries/pl
                                 'orzechy i ziarniste':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/owoce-warzywa/orzechy-i-ziarniste/all?page=1'},
              'Nabial i jaja':{'mleko':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/nabial-i-jaja/mleko/all?page=1',
                               'smietana':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/nabial-i-jaja/smietana/all?page=1',
-                              'jaja':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/nabial-i-jaja/jaja/all?page=1'}}
+                              'jaja':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/nabial-i-jaja/jaja/all?page=1',
+                              'jogurty':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/nabial-i-jaja/jogurty/all?page=1',
+                              'ser':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/nabial-i-jaja/ser/all?page=1',
+                              'maslo i margaryna':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/nabial-i-jaja/maslo-i-margaryna/all?page=1'},
+             'Pieczywo i cukiernia':{'chleb':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/pieczywo-cukiernia/chleb/all?page=1',
+                                     'bulki':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/pieczywo-cukiernia/bulki/all?page=1',
+                                     'cukiernia':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/pieczywo-cukiernia/cukiernia/all?page=1'},
+             'Napoje':{'woda':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/napoje/woda/all?page=1',
+                        'soki':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/napoje/soki-nektary-napoje-owocowe/all?page=1',
+                        'napoje gazowane':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/napoje/napoje-gazowane/all?page=1',
+                        'napoje niegazowane':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/napoje/napoje-niegazowane/all?page=1'},
+             'Mrozonki':{'warzywa i owoce':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/mrozonki/mrozone-warzywa-i-owoce/all?page=1',
+                         'lody':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/mrozonki/lody/all?page=1',
+                         'pizza i frytki':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/mrozonki/mrozone-pizza-i-frytki/all?page=1',
+                         'dania mrozone':'https://ezakupy.tesco.pl/groceries/pl-PL/shop/mrozonki/dania-mrozone/all?page=1'}
+                        
+             }
 
 type = 1
 sub_type = 1
 id=0
-php_file = 'produkty.php'
+file_index=1
+php_file = 'produkty'
+max_size = 542598
+utf_error = False
+
 file_content="""<?php
 include(dirname(__FILE__).'/config/config.inc.php');
 include(dirname(__FILE__).'/init.php');
 $default_lang = Configuration::get(\'PS_LANG_DEFAULT\');\n"""
+with open(php_file+'%i.php' % file_index, 'w') as fi:
+    fi.write(file_content)
+    fi.close()
+product_content=''
 for kategoria, podkategoria in tesco_url.items():
     for nazwa, strona_z_produktami in podkategoria.items():
         page_number = 1
@@ -33,7 +57,11 @@ for kategoria, podkategoria in tesco_url.items():
                     decoded_html = decoded_html.replace('&quot;','\'')
                     filename = '%s.txt' % nazwa
                     products = re.findall(r"\'product'[^\s]*\'title\':\'[^']*\'[^\s]*\'shortDescription\':\'[^']*\'[^\s]*\'unitPrice\'", decoded_html)
-                    for product in products:
+                    for product in products: 
+                        if utf_error == True:
+                            utf_error = False
+                            continue
+                        product_content=''
                         full_title = re.findall(r"\'title\':\'[^']*\'", product)
                         #title = re.findall(r"[^']*", title_with_quote)
 
@@ -43,15 +71,15 @@ for kategoria, podkategoria in tesco_url.items():
                         full_price = re.findall(r"\'price\':[^']*\'", product)
                         index=0
                         while isinstance(full_title, list) and index < len(full_title):
-                            file_content += "$product = new Product(%s);\n" % str(id)
-                            file_content += "$image = new Image();"
+                            product_content += "$product = new Product(%s);\n" % str(id)
+                            product_content += "$image = new Image();"
                             id+=1 
 
                             title_with_quote = re.findall(r"\'[^']*\'", full_title[index])
                             title = re.findall(r"[^']*", title_with_quote[1])[1]
 
-                            file_content += "$product->name = [$default_lang => %s];\n" % title_with_quote[1]
-                            file_content += "$product->link_rewrite = [$default_lang => %s];\n" % title_with_quote[1]
+                            product_content += "$product->name = [$default_lang => %s];\n" % title_with_quote[1]
+                            product_content += "$product->link_rewrite = [$default_lang => %s];\n" % title_with_quote[1]
 
                             defaultImageUrl_with_quote = re.findall(r"\'[^']*\'", full_defaultImageUrl[index])[1]
                             defaultImageUrl = re.findall(r"[^']*", defaultImageUrl_with_quote)[1]
@@ -61,33 +89,48 @@ for kategoria, podkategoria in tesco_url.items():
 
                             price_with_quote = re.findall(r":[^']*", full_price[index])
                             price = re.findall(r"[^:,]*", price_with_quote[0])
-                            file_content += "$product->price = %2.2f;\n" % float(price[1])
+                            product_content += "$product->price = %2.2f;\n" % float(price[1])
 
-                            file_content += "$product->quantity = 10;\n"
-                            file_content += "$product->id_category =[%s,%s];\n" % (str(type), str(sub_type))
-                            file_content += "$product->id_category_default = %s;\n" % str(type)
+                            product_content += "$product->quantity = 10;\n"
+                            product_content += "$product->id_category =[%s,%s];\n" % (str(type), str(sub_type))
+                            product_content += "$product->id_category_default = %s;\n" % str(type)
 
-                            file_content += """if ($product->add())
-                            {
-                                $product->updateCategories($product->id_category);
-                                StockAvailable::setQuantity((int)$product->id,0,$product->quantity,Context::getContext()->shop->id);
-                            }
-                            """
-                            file_content += """ $image->id_product = intval($product->id);
+                            product_content += """if ($product->add())
+    {
+        $product->updateCategories($product->id_category);
+        StockAvailable::setQuantity((int)$product->id,0,$product->quantity,Context::getContext()->shop->id);
+    }
+"""
+                            #product_content += """ $image->id_product = intval($product->id);
 
-                                                $image->position = Image::getHighestPosition($product->id) + 1;
-                                                if(Image::getImagesTotal($product->id)>0)
-                                                 $image->cover = false;
-                                                else
-                                                  $image->cover = true;
-                                                $languages = Language::getLanguages();
-                                                foreach ($languages as $language)
-                                                 $image->legend[$language['id_lang']] = 'Click to view';
-                                                $id_image = $image->id;
-                                                $image->add();
-                                                $tmpName = tempnam(_PS_IMG_DIR_, 'PS');
-                                                move_uploaded_file($_FILES['design']['tmp_name'], $tmpName);"""
-
+                            #                    $image->position = Image::getHighestPosition($product->id) + 1;
+                            #                    if(Image::getImagesTotal($product->id)>0)
+                            #                     $image->cover = false;
+                            #                    else
+                            #                      $image->cover = true;
+                            #                    $languages = Language::getLanguages();
+                            #                    foreach ($languages as $language)
+                            #                     $image->legend[$language['id_lang']] = 'Click to view';
+                            #                    $id_image = $image->id;
+                            #                    $image->add();
+                            #                    $tmpName = tempnam(_PS_IMG_DIR_, 'PS');
+                            #                    move_uploaded_file($_FILES['design']['tmp_name'], $tmpName);"""
+                            #if len(file_content)+len(product_content) > max_size:
+                            #    with open(php_file+'%i.php' % file_index, 'w') as fi:
+                            #        fi.write(file_content)
+                            #        file_index += 1
+                            #        file_content="""<?php
+                            #        include(dirname(__FILE__).'/config/config.inc.php');
+                            #        include(dirname(__FILE__).'/init.php');
+                            #        $default_lang = Configuration::get(\'PS_LANG_DEFAULT\');\n"""
+                            with open(php_file+'%i.php' % file_index, 'a') as fi:
+                                try:
+                                    fi.write(product_content)
+                                    fi.close()
+                                except Exception as e:
+                                    fi.close()
+                                    utf_error = True
+                                    break
                             index+=1
             except Exception as e:
                 break
@@ -96,8 +139,7 @@ for kategoria, podkategoria in tesco_url.items():
             strona_z_produktami = strona_z_produktami[:-1] + (str(page_number))
         sub_type += 1
     type += 1
-with open(php_file, 'w') as fi:
-    fi.write(file_content)
+
 
 
 
