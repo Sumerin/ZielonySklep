@@ -56,7 +56,6 @@ RUN cd /var/www \
     && git init \
     && git pull https://github.com/Sumerin/ZielonySklep.git \
     && chmod +x permit_all.sh \
-	&& python3 TescoPars/TescoPars.py \
     && find -type d -exec chmod 777 {} \; \
     && find -type f -exec chmod 777 {} \;
  
