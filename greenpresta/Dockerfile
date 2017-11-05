@@ -43,7 +43,7 @@ RUN docker-php-source extract \
 
 ENV PS_VERSION 1.6.1.17
 
-# Prepare install and CMD script
+# Prepare install and CMD script xd
 COPY config_files/docker_run.sh /tmp/
 
 # Extract
@@ -56,7 +56,6 @@ RUN cd /var/www \
     && git init \
     && git pull https://github.com/Sumerin/ZielonySklep.git \
     && chmod +x permit_all.sh \
-	&& python3 TescoPars/TescoPars.py \
     && find -type d -exec chmod 777 {} \; \
     && find -type f -exec chmod 777 {} \;
  
