@@ -43,7 +43,7 @@ RUN docker-php-source extract \
 
 ENV PS_VERSION 1.6.1.17
 
-# Prepare install and CMD script
+# Prepare install and CMD script xd
 COPY config_files/docker_run.sh /tmp/
 
 # Extract
