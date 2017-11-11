@@ -9,7 +9,7 @@ some-prestashop:
     build: ./greenpresta/
     dockerfile: Dockerfile
     ports:
-        - "8080:80"
+        - "80:80"
     links:
         - some-mysql
          
