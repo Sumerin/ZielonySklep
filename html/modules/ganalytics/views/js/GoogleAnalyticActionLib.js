@@ -24,6 +24,51 @@
  **/
 
 /* globals $, ga, jQuery */
+function checkCookie()
+{ 
+	var cookies  = document.cookie.split(';');
+	var isSetEnternace = false;
+	for(let i =0;i<cookies.length;i++)
+	{
+		if(cookies[i].indexOf("enterance")!==-1)
+		{
+			isSetEnternace = true;
+			}
+	}
+	if(!isSetEnternace)
+	{
+		document.cookie = "enterance="+ new Date();
+	}
+}
+
+function checkSite()
+{
+	let loc = location.pathname;
+	if(loc=="/zamowienie")
+	{
+			let date  = document.cookie.split(';');
+			let mydate;
+			for(let i =0;i<date.length;i++)
+			{
+				if(date[i].indexOf("enterance")!==-1)
+				{
+					mydate = date[i].substring(9,date[i].length);
+				}
+			}
+			let diff = new Date() - new Date(mydate);
+
+		ga('send','timing', 'User shooping', 'time', diff);
+		document.cookie = "enterance=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";  
+	}
+
+}
+			
+$(function()
+{
+	checkCookie();
+	checkSite();
+});
+
 
 var GoogleAnalyticEnhancedECommerce = {
 

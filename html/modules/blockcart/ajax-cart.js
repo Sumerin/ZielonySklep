@@ -207,6 +207,8 @@ var ajaxCart = {
 			data: 'controller=cart&add=1&ajax=true&qty=' + ((quantity && quantity != null) ? quantity : '1') + '&id_product=' + idProduct + '&token=' + static_token + ( (parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination): ''),
 			success: function(jsonData,textStatus,jqXHR)
 			{
+				// SUMEK TU BYl
+				alert("SUEK TU BYL");
 				// add appliance to wishlist module
 				if (wishlist && !jsonData.errors)
 					WishlistAddProductCart(wishlist[0], idProduct, idCombination, wishlist[1]);
