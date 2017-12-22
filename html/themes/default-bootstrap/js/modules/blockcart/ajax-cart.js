@@ -132,8 +132,7 @@ var ajaxCart = {
 			e.preventDefault();
 			var price = parseFloat($(e.target).parent().parent().parent().children(".content_price").children(".price.product-price")[0].innerText.replace(",","."));
                         var name = $(e.target).parent().parent().parent().children()[0].innerText; 
-			var category = $(e.target).parent().parent().parent().parent().parent().parent().parent().parent().parent()
-							.children(".breadcrumb.clearfix").children(".navigation_page").children()[0].innerText;
+			var category = $(e.target).parent().parent().parent().parent().parent().parent().parent().parent().parent().children(".breadcrumb.clearfix").children(".navigation_page").children()[0].innerText;
 			var idProduct =  parseInt($(this).data('id-product'));
 			var idProductAttribute =  parseInt($(this).data('id-product-attribute'));
 			var minimalQuantity =  parseInt($(this).data('minimal_quantity'));
@@ -911,3 +910,4 @@ function crossselling_serialScroll()
 			pager: false
 		});
 }
+

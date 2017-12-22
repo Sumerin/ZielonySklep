@@ -219,5 +219,26 @@ var GoogleAnalyticEnhancedECommerce = {
 			//'option':'Visa'
 		});
 		//ga('send', 'pageview');
+	},
+	
+	addPromotionClick: function(id,name,creat,pos) {
+		ga('ec:addPromo',{
+		'id': id,
+		'name': name,
+		'creative': creat,
+		'position': pos
+		});
+
+		ga('ec:setAction', 'promo_click');
+		ga('send','event','Internal Promotions','click',name);
+	},
+
+	addPromotionImpression: function(id,name,creat,pos) {
+		ga('ec:addPromo',{
+		'id': id,
+		'name': name,
+		'creative': creat,
+		'position': pos
+		});
 	}
 };

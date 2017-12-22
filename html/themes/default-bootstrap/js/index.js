@@ -25,4 +25,22 @@
 
 $(document).ready(function(){
 	$('#home-page-tabs li:first, #index .tab-content ul:first').addClass('active');
+	
+	$(".item-img").each(function(){
+		var title = $(this).attr("title");
+		var id = parseInt(title.split('-')[0]);
+		var name = title.split('-')[1];
+		var posIm = $($(this).parent().parent().parent().parent()).attr("id");
+		GoogleAnalyticEnhancedECommerce.addPromotionImpression(id,name,title,posIm); 
+	});
+	
+	$(document).off('click', '.item-img').on('click','.item-img', function(e){
+/*		e.preventDefault();
+*/		var splitTit=$(e.target).attr("title");
+		var idProm = parseInt(splitTit.split('-')[0]);
+		var nameProm = splitTit.split('-')[1];
+		var pos = $($(e.target).parent().parent().parent().parent()).attr("id");
+		GoogleAnalyticEnhancedECommerce.addPromotionClick(idProm,nameProm,splitTit,pos);
+	});
+
 });

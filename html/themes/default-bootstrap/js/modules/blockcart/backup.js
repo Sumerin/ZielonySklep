@@ -130,26 +130,41 @@ var ajaxCart = {
 		//for every 'add' buttons...
 		$(document).off('click', '.ajax_add_to_cart_button').on('click', '.ajax_add_to_cart_button', function(e){
 			e.preventDefault();
+			var price = parseFloat($(e.target).parent().parent().parent().children(".content_price").children(".price.product-price")[0].innerText.replace(",","."));
+                        var name = $(e.target).parent().parent().parent().children()[0].innerText; 
+			var category = $(e.target).parent().parent().parent().parent().parent().parent().parent().parent().parent().children(".breadcrumb.clearfix").children(".navigation_page").children()[0].innerText;
 			var idProduct =  parseInt($(this).data('id-product'));
 			var idProductAttribute =  parseInt($(this).data('id-product-attribute'));
 			var minimalQuantity =  parseInt($(this).data('minimal_quantity'));
 			if (!minimalQuantity)
 				minimalQuantity = 1;
 			if ($(this).prop('disabled') != 'disabled')
-				ajaxCart.add(idProduct, idProductAttribute, false, this, minimalQuantity);
+				ajaxCart.add(idProduct, idProductAttribute, false, this, minimalQuantity,null, price, name, category);
 		});
 		//for product page 'add' button...
 		if ($('.cart_block').length) {
 			$(document).off('click', '#add_to_cart button').on('click', '#add_to_cart button', function(e){
 				e.preventDefault();
-				ajaxCart.add($('#product_page_product_id').val(), $('#idCombination').val(), true, null, $('#quantity_wanted').val(), null);
+				var price = parseFloat($('#our_price_display')[0].textContent.replace(",","."));
+				var category = $(e.target).parent().parent().parent().parent().parent().parent().parent().parent().parent().parent().parent().parent().
+								children(".breadcrumb.clearfix").children(".navigation_page").children()[0].innerText;
+				var name = $(e.target).parent().parent().parent().parent().parent().parent().parent().parent().children(".pb-center-column.col-xs-12.col-sm-4").children()[0].innerText;
+				ajaxCart.add($('#product_page_product_id').val(), $('#idCombination').val(), true, null, $('#quantity_wanted').val(), null,price, name, category);
 			});
 		}
 
 		//for 'delete' buttons in the cart block...
 		$(document).off('click', '.cart_block_list .ajax_cart_block_remove_link').on('click', '.cart_block_list .ajax_cart_block_remove_link', function(e){
 			e.preventDefault();
-			// Customized product management
+		       var price = $($(e.target).parent().parent().children()[1]).children()[1].innerText.replace(",",".").slice(0,-3);
+                        var name = $($(e.target).parent().parent().children()[1]).children()[0].innerText; 
+			var category = null;
+	                var quantity = $($(e.target).parent().parent().children()[1]).children()[0].innerText.substr(0,name.indexOf('X')).slice(0,-1);			
+			var minimalQuantity =  parseInt($(this).data('minimal_quantity'));
+			if (!minimalQuantity)
+				minimalQuantity = 1;
+			if ($(this).prop('disabled') != 'disabled')
+                        // Customized product management
 			var customizationId = 0;
 			var productId = 0;
 			var productAttributeId = 0;
@@ -186,7 +201,7 @@ var ajaxCart = {
 			}
 
 			// Removing product from the cart
-			ajaxCart.remove(productId, productAttributeId, customizationId, idAddressDelivery);
+			ajaxCart.remove(productId, productAttributeId, customizationId, idAddressDelivery, quantity, null, price, name, category);
 		});
 	},
 
@@ -278,7 +293,7 @@ var ajaxCart = {
 	// close fancybox
 	updateFancyBox : function (){},
 	// add a product in the cart via ajax
-	add : function(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist){
+	add : function(idProduct, idCombination, addedFromProductPage, callerElement, quantity, whishlist, price, name, category){
 
 		if (addedFromProductPage && !checkCustomizations())
 		{
@@ -328,8 +343,10 @@ var ajaxCart = {
 			data: 'controller=cart&add=1&ajax=true&qty=' + ((quantity && quantity != null) ? quantity : '1') + '&id_product=' + idProduct + '&token=' + static_token + ( (parseInt(idCombination) && idCombination != null) ? '&ipa=' + parseInt(idCombination): '' + '&id_customization=' + ((typeof customizationId !== 'undefined') ? customizationId : 0)),
 			success: function(jsonData,textStatus,jqXHR)
 			{
-				GoogleAnalyticEnhancedECommerce.addToCart(idProduct);
-				alert("Sumek Tu Byl D
+				var MBG = GoogleAnalyticEnhancedECommerce;
+				MBG.setCurrency('PLN');
+				MBG.addToCart({"id":idProduct,"name":name,"category":category,"brand":"","variant":"null","type":"typical","position":"","quantity":quantity,"list":"cart","url":"","price":price});
+				
 				// add appliance to whishlist module
 				if (whishlist && !jsonData.errors)
 					WishlistAddProductCart(whishlist[0], idProduct, idCombination, whishlist[1]);
@@ -404,7 +421,7 @@ var ajaxCart = {
 	},
 
 	//remove a product from the cart via ajax
-	remove : function(idProduct, idCombination, customizationId, idAddressDelivery){
+	remove : function(idProduct, idCombination, customizationId, idAddressDelivery, quantity, whishlist, price, name, category){
 		//send the ajax request to the server
 		$.ajax({
 			type: 'POST',
@@ -415,6 +432,9 @@ var ajaxCart = {
 			dataType : "json",
 			data: 'controller=cart&delete=1&id_product=' + idProduct + '&ipa=' + ((idCombination != null && parseInt(idCombination)) ? idCombination : '') + ((customizationId && customizationId != null) ? '&id_customization=' + customizationId : '') + '&id_address_delivery=' + idAddressDelivery + '&token=' + static_token + '&ajax=true',
 			success: function(jsonData)	{
+                        var MBG = GoogleAnalyticEnhancedECommerce;
+                        MBG.setCurrency('PLN');
+                        MBG.removeFromCart({"id":idProduct,"name":name,"category":category,"brand":"","variant":"null","type":"typical","position":"","quantity":quantity,"list":"cart","url":"","price":price});
 				ajaxCart.updateCart(jsonData);
 				if ($('body').attr('id') == 'order' || $('body').attr('id') == 'order-opc')
 					deleteProductFromSummary(idProduct+'_'+idCombination+'_'+customizationId+'_'+idAddressDelivery);
@@ -890,3 +910,4 @@ function crossselling_serialScroll()
 			pager: false
 		});
 }
+/*
