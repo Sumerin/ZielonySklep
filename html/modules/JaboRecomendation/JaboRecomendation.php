@@ -27,7 +27,7 @@ class JaboRecomendation extends Module
 
   public function install()
 	{
-	if(!parent::install() ||!$this->registerHook('home') )
+	if(!parent::install() ||!$this->registerHook('Top') || !$this->registerHook('sumekCMS') )
 		{
 		return false;
 		}
@@ -36,10 +36,10 @@ class JaboRecomendation extends Module
 
 public function getContent() {
                                                                                                 
-    if(Tools::isSubmit('submit_reco')){
+    if(Tools::isSubmit('submit_text')){
 	Configuration::updateValue(
-		$this->name.'_search',
-		Tools::getValue('RecoName')
+		$this->name.'_path_to_java',
+		Tools::getValue('the_text')
 		);
 	}
                                                                                                 
@@ -49,29 +49,42 @@ public function getContent() {
                                                                                                 
 private function _generateForm() {
                                                                                                 
-    $textToShow=Configuration::get($this->name.'_text_to_show');
+    $textToShow=Configuration::get($this->name.'_path_to_java');
                                                                                                 
     $this->_html .= '<form action="'.$_SERVER['REQUEST_URI'].'" method="post">';
-    $this->_html .= '<label>'.$this->l('Enter your text: ').'</label>';
+    $this->_html .= '<label>'.$this->l('Sciezka do pliku:: ').'</label>';
     $this->_html .= '<div class="margin-form">';
     $this->_html .= '<input type="text" name="the_text" value="'.$textToShow.'" >';
     $this->_html .= '<input type="submit" name="submit_text" ';
-    $this->_html .= 'value="'.$this->l('Update the text').'" class="button" />';
+    $this->_html .= 'value="'.$this->l('Ustaw').'" class="button" />';
     $this->_html .= '</div>';
     $this->_html .= '</form>';
 }
                                                                                                 
-public function hookDisplayHome() {
+public function hookDisplayTop() {
 
-	$product = "";
+	$output = "";
 	if(Tools::isSubmit('submit_reco')){
-              $product = Tools::getValue('RecoName');
+           	$output =  exec("java -jar JavaApplication2.jar lol");//+ Tools::getValue('RecoName'));
         }
                                                                                                 
     global $smarty;
-    $smarty->assign('sea',$product);
     return $this->display(__FILE__, 'JaboRecomendation.tpl');
                                                                                                 
 }
-                                                     
+ 
+
+public function hooksumekCMS(){
+	if (Tools::getValue('id_cms') != 6)
+        return;
+
+	$response;
+	$script = Configuration::get($this->name.'_path_to_java');
+
+	exec('java -jar ' + $script + ' mamaFufra', $response);
+	
+	global $smarty;
+	$smarty->assign('text',$response);
+	return $this->display(__FILE__, 'JaboRecomendationCMS.tpl');
+	}                                                    
 }

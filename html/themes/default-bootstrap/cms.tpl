@@ -36,6 +36,7 @@
 			<p id="admin-action-result"></p>
 		</div>
 	{/if}
+	{hook h='sumekCMS'}
 	<div class="rte{if $content_only} content_only{/if}">
 		{$cms->content}
 	</div>
