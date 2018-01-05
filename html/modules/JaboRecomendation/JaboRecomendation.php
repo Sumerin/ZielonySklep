@@ -78,11 +78,18 @@ public function hooksumekCMS(){
 	if (Tools::getValue('id_cms') != 6)
         return;
 
-	$response;
+	$response = "";
 	$script = Configuration::get($this->name.'_path_to_java');
-
-	exec('java -jar ' + $script + ' mamaFufra', $response);
+	$param = "TO_JA_JABOL_JA_JA";
 	
+	$command = 'java -jar ' . $script .  ' ' . $param ;
+	$response = shell_exec($command);
+	//exec($command,$response);// get the last line;
+	
+	echo "komenda: " . $command . '<br>';
+	echo "Output: " . $response . '<br>';
+	echo "sciezka: " . $script . '<br>';
+
 	global $smarty;
 	$smarty->assign('text',$response);
 	return $this->display(__FILE__, 'JaboRecomendationCMS.tpl');
