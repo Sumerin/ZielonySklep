@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+	<name>ekomiintegration</name>
+	<displayName><![CDATA[Ekomi Integration]]></displayName>
+	<version><![CDATA[1.4.1]]></version>
+	<description><![CDATA[eKomi Plugin for Prestashop allows you to integrate your Prestashop easily with
+        eKomi system. This allows you to collect verified reviews, display eKomi seal on your website and get your
+        seller ratings on Google. This helps you increase your website&#039;s click through rates, conversion rates and
+        also, if you are running Google AdWord Campaigns, this helps in improving your Quality Score and hence your
+        costs per click.          eKomi Reviews and Ratings allows you to:          a. Collect Reviews      b. Manage
+        Reviews: our team of Customer Feedback Managers, reviews each and every review for any terms which are not
+        allowed and also put all negative reviews in moderation.      c. Publish reviews on search engines: Google,
+        Bing, Yahoo!      eKomi is available in English, French, German, Spanish, Dutch, Italian, Russian and Polish
+        (more languages coming soon).     If you have any questions regarding the plugin, please contact your eKomi
+        Account Manager.    Please note that you will need an eKomi account to use the plugin. To create an eKomi
+        account, go to eKomi.com.]]></description>
+	<author><![CDATA[Ekomi]]></author>
+	<tab><![CDATA[analytics_stats]]></tab>
+	<confirmUninstall><![CDATA[Are you sure you want to uninstall?]]></confirmUninstall>
+	<is_configurable>1</is_configurable>
+	<need_instance>0</need_instance>
+	<limited_countries></limited_countries>
+</module>

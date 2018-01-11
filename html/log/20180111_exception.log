@@ -1,0 +1,4 @@
+*ERROR* 	2018/01/11 - 22:34:46: Unknown column 'user_id' in 'where clause'<br /><br /><pre>SELECT * FROM `ps_do_koszyka` WHERE product_id = 125 AND user_id = "6" LIMIT 1</pre> at line 791 in file classes/db/Db.php
+*ERROR* 	2018/01/11 - 22:35:22: Unknown column 'user_id' in 'where clause'<br /><br /><pre>SELECT * FROM `ps_do_koszyka` WHERE product_id = 125 AND user_id = 6 LIMIT 1</pre> at line 791 in file classes/db/Db.php
+*ERROR* 	2018/01/11 - 22:36:00: Unknown column 'customer_id' in 'where clause'<br /><br /><pre>SELECT * FROM `ps_do_koszyka` WHERE product_id = 125 AND customer_id = 6 LIMIT 1</pre> at line 791 in file classes/db/Db.php
+*ERROR* 	2018/01/11 - 22:37:58: Unknown table 'prestashop.ps_do_koszyka'<br /><br /><pre>DROP TABLE ps_do_koszyka;</pre> at line 791 in file classes/db/Db.php

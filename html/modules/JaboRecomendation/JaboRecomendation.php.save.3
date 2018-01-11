@@ -27,12 +27,25 @@ class JaboRecomendation extends Module
 
   public function install()
 	{
-	if(!parent::install() ||!$this->registerHook('Top') || !$this->registerHook('sumekCMS')||!$this->registerHook('Header') || !$this->registerHook('actionCartSave'))
+	if(!parent::install() ||!$this->registerHook('Top') || !$this->registerHook('sumekCMS') )
 		{
 		return false;
 		}
 	return true;
 	}
+
+
+public function setMedia()
+    {
+        parent::setMedia();
+        if ($this->assignCase == 1)
+        {
+            $this->addJS(_THEME_JS_DIR_ . 'cms.js');
+        }
+        $this->addCSS(_THEME_CSS_DIR_ . 'product_list.css');
+        $this->addCSS(_THEME_CSS_DIR_ . 'cms.css');
+        $this->addCSS(_PS_MODULE_DIR_ . 'JaboRecomendation/cmsproducts.css');
+    }
 
 public function getContent() {
                                                                                                 
@@ -40,8 +53,7 @@ public function getContent() {
 	Configuration::updateValue(
 		$this->name.'_path_to_java',
 		Tools::getValue('the_text')
-		);
-	}
+		);	}
                                                                                                 
     $this->_generateForm();
     return $this->_html;
@@ -93,15 +105,7 @@ private function getImagesByID($id_product, $limit = 0)
     }
  
 
-public function hookHeader()
-{
-	Tools::addCSS(_THEME_CSS_DIR_ . 'product_list.css');
-        Tools::addCSS(_THEME_CSS_DIR_ . 'cms.css');
-        Tools::addCSS(_PS_MODULE_DIR_ . 'JaboRecomendation/cmsproducts.css');
-
-}
-
-public function hooksumekCMS($params){
+public function hooksumekCMS(){
 	if (Tools::getValue('id_cms') != 6)
         return;
 
@@ -112,36 +116,11 @@ public function hooksumekCMS($params){
 	$command = 'java -jar ' . $script .  ' ' . $param ;
 	$response = shell_exec($command);
 	//exec($command,$response);// get the last line;
-
-	$views = Db::getInstance()->ExecuteS('SELECT * FROM `' . _DB_PREFIX_ . 'do_koszyka`');
-///////////////////// 
-//TUTAJ $row REPREZENTUJE JEDEN WPIS, CZYLI TRZEBA TO WRZUCIC DO STRUKTURY KTORA POBIERZE MAHOUT, AKTUALNIE TYLKO WYPISYWANIE
-////////////////////
-        foreach ($views as $row)
-                echo "views: " . $row['customer_id'] . ' i ' . $row['product_id'] . '<br>';	
+	
 	echo "komenda: " . $command . '<br>';
 	echo "Output: " . $response . '<br>';
 	echo "sciezka: " . $script . '<br>';
 
-foreach ($params as $kurwa => $mac)
-{
-	
-	if ($kurwa == "cart" &&  get_class($mac) == "Cart")
-	{
-	foreach ($mac->getProducts() as $key => $val)
-	{
-	///////////////
-	//TU POZNAJEMY ID UZYTKOWNIKA ZALOGOWANEGO, MAHOUT BEDZIE WIEDZIAL KOMU POLECA
-	/////////////
-		$id_zalogowanego_uzytkownika = $mac->id_customer;
-	}
-	}
-}
-
-
-	Tools::addCSS(_THEME_CSS_DIR_ . 'product_list.css');
-	Tools::addCSS(_THEME_CSS_DIR_ . 'cms.css');
-	Tools::addCSS(_PS_MODULE_DIR_ . 'JaboRecomendation/cmsproducts.css');
 
 
 	$explode_products = explode(",", $response);
@@ -187,29 +166,5 @@ foreach ($params as $kurwa => $mac)
 	return $this->display(__FILE__, 'JaboRecomendationCMS.tpl');
 */	}
 
-public function hookactionCartSave($params){
-
-	//Db::getInstance()->Execute('DROP TABLE ps_do_koszyka;');
-        //Db::getInstance()->Execute('CREATE TABLE IF NOT EXISTS ps_do_koszyka (product_id int, customer_id int, PRIMARY KEY(product_id,customer_id) )');
-        $email = $this->context->customer->email;
-if ($email == '')
-	return;
-foreach ($params as $kurwa => $mac)
-{
-	
-	if ($kurwa == "cart" &&  get_class($mac) == "Cart")
-	{
-	foreach ($mac->getProducts() as $key => $val)
-		{	
-		$dbdata = array('product_id' => $val["id_product"], 'customer_id' => $mac->id_customer);
-        	$row = Db::getInstance()->getRow('SELECT * FROM `' . _DB_PREFIX_ . 'do_koszyka` WHERE product_id = ' . $val["id_product"] . ' AND customer_id = ' . $mac->id_customer . ' ');
-        	if ($row == '')
-			Db::getInstance()->insert('do_koszyka',$dbdata);
-		//echo "<script> console.log('" . $val["id_product"] . " ');</script>";
-		}
-	}
-}
-
-}
                                                     
 }

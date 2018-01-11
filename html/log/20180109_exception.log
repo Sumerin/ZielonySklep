@@ -1,0 +1,1 @@
+*ERROR* 	2018/01/09 - 19:24:10: Unknown column 'Array' in 'where clause'<br /><br /><pre>SELECT * FROM `ps_do_koszyka` WHERE product_id = Array AND user_mail = "siemano@gmail.com" LIMIT 1</pre> at line 791 in file classes/db/Db.php

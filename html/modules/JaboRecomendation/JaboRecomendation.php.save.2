@@ -27,7 +27,7 @@ class JaboRecomendation extends Module
 
   public function install()
 	{
-	if(!parent::install() ||!$this->registerHook('Top') || !$this->registerHook('sumekCMS')||!$this->registerHook('Header') || !$this->registerHook('actionCartSave'))
+	if(!parent::install() ||!$this->registerHook('Top') || !$this->registerHook('sumekCMS') )
 		{
 		return false;
 		}
@@ -93,58 +93,9 @@ private function getImagesByID($id_product, $limit = 0)
     }
  
 
-public function hookHeader()
-{
-	Tools::addCSS(_THEME_CSS_DIR_ . 'product_list.css');
-        Tools::addCSS(_THEME_CSS_DIR_ . 'cms.css');
-        Tools::addCSS(_PS_MODULE_DIR_ . 'JaboRecomendation/cmsproducts.css');
-
-}
-
-public function hooksumekCMS($params){
-	if (Tools::getValue('id_cms') != 6)
-        return;
-
-	$response = "";
-	$script = Configuration::get($this->name.'_path_to_java');
-	$param = "20,16,19,100";
-	
-	$command = 'java -jar ' . $script .  ' ' . $param ;
-	$response = shell_exec($command);
-	//exec($command,$response);// get the last line;
-
-	$views = Db::getInstance()->ExecuteS('SELECT * FROM `' . _DB_PREFIX_ . 'do_koszyka`');
-///////////////////// 
-//TUTAJ $row REPREZENTUJE JEDEN WPIS, CZYLI TRZEBA TO WRZUCIC DO STRUKTURY KTORA POBIERZE MAHOUT, AKTUALNIE TYLKO WYPISYWANIE
-////////////////////
-        foreach ($views as $row)
-                echo "views: " . $row['customer_id'] . ' i ' . $row['product_id'] . '<br>';	
-	echo "komenda: " . $command . '<br>';
-	echo "Output: " . $response . '<br>';
-	echo "sciezka: " . $script . '<br>';
-
-foreach ($params as $kurwa => $mac)
-{
-	
-	if ($kurwa == "cart" &&  get_class($mac) == "Cart")
-	{
-	foreach ($mac->getProducts() as $key => $val)
-	{
-	///////////////
-	//TU POZNAJEMY ID UZYTKOWNIKA ZALOGOWANEGO, MAHOUT BEDZIE WIEDZIAL KOMU POLECA
-	/////////////
-		$id_zalogowanego_uzytkownika = $mac->id_customer;
-	}
-	}
-}
-
-
-	Tools::addCSS(_THEME_CSS_DIR_ . 'product_list.css');
-	Tools::addCSS(_THEME_CSS_DIR_ . 'cms.css');
-	Tools::addCSS(_PS_MODULE_DIR_ . 'JaboRecomendation/cmsproducts.css');
-
-
-	$explode_products = explode(",", $response);
+public function returnProducts($id_product)
+    {
+        $explode_products = explode(",", $id_product);
         foreach ($explode_products AS $idp)
         {
             $explode[] = $idp;
@@ -163,53 +114,56 @@ foreach ($params as $kurwa => $mac)
             }
         }
         $products = Product::getProductsProperties($this->context->language->id, $productss);
+        $this->context->smarty->assign('products', $products);
+        $this->context->smarty->assign('feedtype', "cmsProductsFeed");
+        $this->display(__FILE__. '/products.tpl');
+    }
 
-	global $smarty;        
-	$smarty->assign('products', $products);
-        $smarty->assign('feedtype', "cmsProductsFeed");
-        return $this->display(__FILE__ , 'JaboRecomendationProducts.tpl');
+
+public function hooksumekCMS(){
+	if (Tools::getValue('id_cms') != 6)
+        return;
+
+	$response = "";
+	$script = Configuration::get($this->name.'_path_to_java');
+	$param = "20,16,19,100";
+	
+	$command = 'java -jar ' . $script .  ' ' . $param ;
+	$response = shell_exec($command);
+	//exec($command,$response);// get the last line;
+	
+	echo "komenda: " . $command . '<br>';
+	echo "Output: " . $response . '<br>';
+	echo "sciezka: " . $script . '<br>';
+
+{*
+* PrestaShop module created by VEKIA, a guy from official PrestaShop community ;-)
+*
+* @author    VEKIA https://www.prestashop.com/forums/user/132608-vekia/
+* @copyright 2010-2016 VEKIA
+* @license   This program is not free software and you can't resell and redistribute it
+*
+* CONTACT WITH DEVELOPER
+* support@mypresta.eu
+*}
+
+{if Configuration::get('cmsproducts_hide')!=1}
+    {if $feedtype == 'noProducts'}
+        <p class="alert alert-warning">{l s='No products available in this feed.' mod='cmsproducts'}</p>
+    {else if $feedtype != 'error'}
+        <div class='row cmsproducts {$feedtype}'>
+            {include file="$tpl_dir./product-list.tpl" class="products" products=$products page_name='index'}
+        </div>
+    {else}
+        <p class="alert alert-warning">{l s='Feed of products is not available.' mod='cmsproducts'} {l s='Module:'} {$module} {l s='not found or version of this module is too old' mod='cmsproducts'}</p>
+    {/if}
+{/if}
 
 
-/*
-	$products_id = explode(" ", $response);
-
-	$products = [];
-	foreach($products_id as $product_id)
-	{
-		$prod = new Product($product_id,false,$this->context->language->id);
-		//$image = $this->getImagesByID(20,1);
-		echo $prod->name;
-		$products[] = $prod;
-	}
-
-	global $smarty;
+/*	global $smarty;
 	$smarty->assign('text',$response);
 	return $this->display(__FILE__, 'JaboRecomendationCMS.tpl');
 */	}
 
-public function hookactionCartSave($params){
-
-	//Db::getInstance()->Execute('DROP TABLE ps_do_koszyka;');
-        //Db::getInstance()->Execute('CREATE TABLE IF NOT EXISTS ps_do_koszyka (product_id int, customer_id int, PRIMARY KEY(product_id,customer_id) )');
-        $email = $this->context->customer->email;
-if ($email == '')
-	return;
-foreach ($params as $kurwa => $mac)
-{
-	
-	if ($kurwa == "cart" &&  get_class($mac) == "Cart")
-	{
-	foreach ($mac->getProducts() as $key => $val)
-		{	
-		$dbdata = array('product_id' => $val["id_product"], 'customer_id' => $mac->id_customer);
-        	$row = Db::getInstance()->getRow('SELECT * FROM `' . _DB_PREFIX_ . 'do_koszyka` WHERE product_id = ' . $val["id_product"] . ' AND customer_id = ' . $mac->id_customer . ' ');
-        	if ($row == '')
-			Db::getInstance()->insert('do_koszyka',$dbdata);
-		//echo "<script> console.log('" . $val["id_product"] . " ');</script>";
-		}
-	}
-}
-
-}
                                                     
 }
