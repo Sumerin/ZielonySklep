@@ -110,7 +110,7 @@ class JaboRecomendation extends Module
 
     $response = "";
     $script = Configuration::get($this->name.'_path_to_java');
-    $param = "23,80,21,102";
+    $param = "20,16,19,100";
 
     $command = 'java -jar ' . $script .  ' ' . $param ;
     $response = shell_exec($command);
@@ -119,13 +119,12 @@ class JaboRecomendation extends Module
     $views = Db::getInstance()->ExecuteS('SELECT * FROM `' . _DB_PREFIX_ . 'do_koszyka`');
 ///////////////////// 
 //TUTAJ $row REPREZENTUJE JEDEN WPIS, CZYLI TRZEBA TO WRZUCIC DO STRUKTURY KTORA POBIERZE MAHOUT, AKTUALNIE TYLKO WYPISYWANIE
-//Teraz juz wpisuje do pliczku csv
 ////////////////////
     $dataFile = fopen("data.csv","w");
     $dataFileText = "";    
     foreach ($views as $row)
     {
-       $dataFileText = $dataFileText . $row['customer_id'] . "," . $row['product_id'] . "\n";
+       $dataFileText = $dataFileText . $row['customer_id'] . "," . $row[product_id] . "\n";
        // echo "views: " . $row['customer_id'] . ' i ' . $row['product_id'] . '<br>';	
     }
     fwrite($dataFile,$dataFileText);
@@ -134,16 +133,16 @@ class JaboRecomendation extends Module
     echo "Output: " . $response . '<br>';
     echo "sciezka: " . $script . '<br>';
 
-    foreach ($params as $aaa => $bbb)
+    foreach ($params as $kurwa => $mac)
     {
-      if ($aaa == "cart" &&  get_class($bbb) == "Cart")
+      if ($kurwa == "cart" &&  get_class($mac) == "Cart")
       {
-        foreach ($bbb->getProducts() as $key => $val)
+        foreach ($mac->getProducts() as $key => $val)
         {
 	  ///////////////
 	  //TU POZNAJEMY ID UZYTKOWNIKA ZALOGOWANEGO, MAHOUT BEDZIE WIEDZIAL KOMU POLECA
           /////////////
-          $id_zalogowanego_uzytkownika = $bbb->id_customer;
+          $id_zalogowanego_uzytkownika = $mac->id_customer;
         }
       }
     }
@@ -173,7 +172,7 @@ class JaboRecomendation extends Module
     }
     $products = Product::getProductsProperties($this->context->language->id, $productss);
 
-    global $smarty;        
+    $global $smarty;        
     $smarty->assign('products', $products);
     $smarty->assign('feedtype', "cmsProductsFeed");
     return $this->display(__FILE__ , 'JaboRecomendationProducts.tpl');
@@ -221,4 +220,3 @@ class JaboRecomendation extends Module
       }
     }                                                    
   }
-}
