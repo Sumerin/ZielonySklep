@@ -110,9 +110,9 @@ class JaboRecomendation extends Module
 
     $response = "";
     $script = Configuration::get($this->name.'_path_to_java');
-    $param = "23,80,21,102";
+    $param = "7";
 
-    $command = 'java -jar ' . $script .  ' ' . $param ;
+    $command = 'java -cp ' . $script .  ' com.mycompany.mahautenmahen.Recommender  ' . $param ;
     $response = shell_exec($command);
     //exec($command,$response);// get the last line;
 
@@ -121,7 +121,7 @@ class JaboRecomendation extends Module
 //TUTAJ $row REPREZENTUJE JEDEN WPIS, CZYLI TRZEBA TO WRZUCIC DO STRUKTURY KTORA POBIERZE MAHOUT, AKTUALNIE TYLKO WYPISYWANIE
 //Teraz juz wpisuje do pliczku csv
 ////////////////////
-    $dataFile = fopen("data.csv","w");
+    $dataFile = fopen("datat.csv","w");
     $dataFileText = "";    
     foreach ($views as $row)
     {
@@ -152,16 +152,18 @@ class JaboRecomendation extends Module
     Tools::addCSS(_THEME_CSS_DIR_ . 'product_list.css');
     Tools::addCSS(_THEME_CSS_DIR_ . 'cms.css');
     Tools::addCSS(_PS_MODULE_DIR_ . 'JaboRecomendation/cmsproducts.css');
-
-
+    
+    
     $explode_products = explode(",", $response);
     foreach ($explode_products AS $idp)
     {
       $explode[] = $idp;
       foreach ($explode as $tproduct)
       {
-        if ($tproduct != '')
+	
+        if ($tproduct != '' && $tproduct != '0')
         {
+          echo $tproduct;
           $x = (array)new Product($tproduct, true, $this->context->language->id);
           $productss[$tproduct] = $x;
           $productss[$tproduct]['id_product'] = $tproduct;
